@@ -22,7 +22,7 @@ function varargout = path_planning(varargin)
 
 % Edit the above text to modify the response to help path_planning
 
-% Last Modified by GUIDE v2.5 21-Aug-2022 15:04:03
+% Last Modified by GUIDE v2.5 22-Aug-2022 00:33:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -156,14 +156,23 @@ while (obs(1) < map_size && obs(2) < map_size)
     if (obs(1) < map_size && obs(2) < map_size)
         obs_x = round(obs(1) - 0.5) + 0.5;
         obs_y = round(obs(2) - 0.5) + 0.5;
+        if Valid(obs_x + 0.5, obs_y + 0.5) == 1
+            Valid(obs_x + 0.5, obs_y + 0.5) = 0;
+            plot(obs_x, obs_y,'whites',...
+                'LineWidth',1,...
+                'MarkerSize',round(575 / map_size),...
+                'MarkerEdgeColor',[1, 1, 1],...
+                'MarkerFaceColor',[1, 1, 1]);
+            continue
+        end
         obstacle = [obstacle; [obs_x, obs_y]];
         Valid(obs_x + 0.5, obs_y + 0.5) = 1;
+        plot(obs_x, obs_y,'whites',...
+            'LineWidth',1,...
+            'MarkerSize',round(575 / map_size),...
+            'MarkerEdgeColor',[0, 0, 0],...
+            'MarkerFaceColor',[0, 0, 0]);
     end
-    plot(obstacle(:, 1), obstacle(:, 2),'whites',...
-        'LineWidth',1,...
-        'MarkerSize',round(575 / map_size),...
-        'MarkerEdgeColor',[0, 0, 0],...
-        'MarkerFaceColor',[0, 0, 0]);
 end
 handles.obstacle_point.Value = 0;
 
@@ -223,3 +232,44 @@ global goal;
 global map_size;
 R = RRT;
 R.RRT_path(Valid, start, goal, map_size);
+
+
+% --- Executes on button press in clear_path.
+function clear_path_Callback(hObject, eventdata, handles)
+hold off;
+global map_size;
+global Valid;
+global start;
+global goal;
+plot_x = [];
+plot_y = [];
+for x = 1: 1: map_size
+    for y = 1: 1: map_size
+        if (Valid(x, y) == 1)
+            plot_x = [plot_x, x - 0.5];
+            plot_y = [plot_y, y - 0.5];
+        end
+    end
+end
+plot(plot_x,plot_y,'whites',...
+    'LineWidth',1,...
+    'MarkerSize',round(575 / map_size),...
+    'MarkerEdgeColor','black',...
+    'MarkerFaceColor',[0, 0, 0]);
+hold on;
+plot(start(1), start(2),'whiteo',...
+    'LineWidth',1,...
+    'MarkerSize',round(360/ map_size),...
+    'MarkerEdgeColor','red',...
+    'MarkerFaceColor',[1, 0, 0]);
+
+plot(goal(1), goal(2),'whiteo',...
+    'LineWidth',1,...
+    'MarkerSize',round(360/ map_size),...
+    'MarkerEdgeColor','green',...
+    'MarkerFaceColor',[0, 1, 0]);
+
+
+
+
+

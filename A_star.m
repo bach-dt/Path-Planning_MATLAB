@@ -4,7 +4,7 @@ classdef A_star
         % 3: CLOSED set
         function [] = A_star_path(obj, map, start, goal, map_size)
             hold on;
-                        
+        % COST_MAP(point_x, point_y) = [G_COST, H_COST, F_COST, parent_x, parent_y]  
             COST_MAP = zeros(map_size - 1, map_size - 1, 5);
             COST_MAP(round(start(1)), round(start(2)), 1) = 0;
             COST_MAP(round(start(1)), round(start(2)), 2) = obj.COST(start, goal);
