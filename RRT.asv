@@ -1,0 +1,84 @@
+classdef RRT
+    methods 
+        function [] = RRT_path(obj, map, start, goal, map_size)
+            hold on;
+            max_dms = 10;
+            ExploredSet = [];
+            ExploredSet = [ExploredSet, start];
+            q_new = start;
+            point.data = start;
+            point.prev = [];
+            point.next = [];
+            while (obj.COST(q_new, goal) > max_dms)
+                q_target = [rand(1) * map_size, rand(1) * map_size];
+                min_cost = map_size * 1.41;
+                q_nearest = [];
+                for index = 1: 1: length(ExploredSet)/2
+                    if obj.COST([ExploredSet(2 * index - 1), ExploredSet(2 * index)], q_target) < min_cost
+                        q_nearest = [ExploredSet(2 * index - 1), ExploredSet(2 *index)];
+                        min_cost = obj.COST(q_nearest, q_target);
+                    end
+                end
+                q_new_x = q_nearest(1) + obj.COST_X(q_nearest, q_target) ...
+                            * max_dms / obj.COST(q_nearest, q_target);
+                q_new_y = q_nearest(2) + obj.COST_Y(q_nearest, q_target) ...
+                            * max_dms / obj.COST(q_nearest, q_target);
+                q_new = [q_new_x, q_new_y];
+                
+                % plot([q_target(1), q_nearest(1)], [q_target(2), q_nearest(2)], 'r--o');
+                
+                %{ 
+                disp('Set');
+                disp(ExploredSet);
+                disp('q_target');
+                disp(q_target);
+                disp('q_nearest');
+                disp(q_nearest);
+                disp('q_new');
+                disp(q_new);
+                %}
+                if (q_new_x > 1 && q_new_x < map_size && q_new_y > 1 && q_new_y < map_size)
+                    check_obs = 0;
+                    for d = 1: 0.5: max_dms
+                        q_ck_obs_x = q_nearest(1) + obj.COST_X(q_nearest, q_target) ...
+                            * d / obj.COST(q_nearest, q_target);
+                        q_ck_obs_y = q_nearest(2) + obj.COST_Y(q_nearest, q_target) ...
+                            * d / obj.COST(q_nearest, q_target);
+                        if (map(round(q_ck_obs_x), round(q_ck_obs_y)) ~= 0 ||...
+                            map(round(q_ck_obs_x + 0.5), round(q_ck_obs_y)) ~= 0 ||...
+                            map(round(q_ck_obs_x), round(q_ck_obs_y + 0.5)) ~= 0 ||...
+                            map(round(q_ck_obs_x + 0.5), round(q_ck_obs_y + 0.5)) ~= 0)
+                            check_obs = 1;
+                        end
+                    end
+                        
+                    if (check_obs == 0)
+                        point = point.next
+                        ExploredSet = [ExploredSet, q_new];
+                        plot([q_new_x, q_nearest(1)], [q_new_y, q_nearest(2)], 'g-o');
+                    end
+                end
+            end
+            point = goal;
+            path(:, :, 1) = goal(1);
+            path(:, :, 2) = goal(2);
+            while (point(1) ~= start(1)) || (point(2) ~= start(2))
+                point = Family_map(round(point(1)), round(point(2)), :);
+                path = [path; point];
+            end
+            plot(path(:, 1), path(:, 2),'r-o'); 
+            
+        end
+        function cost = COST(obj, A, B)
+            dis_x = A(1) - B(1);
+            dis_y = A(2) - B(2);
+            cost = sqrt(dis_x * dis_x + dis_y * dis_y);
+        end
+        function cost_x = COST_X(obj, A, B)
+            cost_x = B(1) - A(1);
+        end
+        function cost_y = COST_Y(obj, A, B)
+            cost_y = B(2) - A(2);
+        end
+    end
+end
