@@ -22,7 +22,7 @@ function varargout = path_planning(varargin)
 
 % Edit the above text to modify the response to help path_planning
 
-% Last Modified by GUIDE v2.5 22-Aug-2022 00:33:41
+% Last Modified by GUIDE v2.5 22-Aug-2022 11:49:17
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -214,26 +214,6 @@ plot(edge_x,edge_y,'whites',...
 % --- Executes on mouse press over axes background.
 function map_ButtonDownFcn(hObject, eventdata, handles)
 
-% --- Executes on button press in A_star.
-function A_star_Callback(hObject, eventdata, handles)
-global Valid;
-global start;
-global goal;
-global map_size;
-A = A_star;
-A.A_star_path(Valid, start, goal, map_size);
-
-
-% --- Executes on button press in RRT.
-function RRT_Callback(hObject, eventdata, handles)
-global Valid;
-global start;
-global goal;
-global map_size;
-R = RRT;
-R.RRT_path(Valid, start, goal, map_size);
-
-
 % --- Executes on button press in clear_path.
 function clear_path_Callback(hObject, eventdata, handles)
 hold off;
@@ -269,7 +249,29 @@ plot(goal(1), goal(2),'whiteo',...
     'MarkerEdgeColor','green',...
     'MarkerFaceColor',[0, 1, 0]);
 
+% --- Executes on button press in A_star.
+function A_star_Callback(hObject, eventdata, handles)
+global Valid;
+global start;
+global goal;
+global map_size;
+A = A_star;
+A.A_star_path(Valid, start, goal, map_size);
 
+% --- Executes on button press in RRT.
+function RRT_Callback(hObject, eventdata, handles)
+global Valid;
+global start;
+global goal;
+global map_size;
+R = RRT;
+R.RRT_path(Valid, start, goal, map_size);
 
-
-
+% --- Executes on button press in RRT_connect.
+function RRT_connect_Callback(hObject, eventdata, handles)
+global Valid;
+global start;
+global goal;
+global map_size;
+R = RRT_connect;
+R.RRT_connect_path(Valid, start, goal, map_size);
