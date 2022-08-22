@@ -17,7 +17,7 @@ classdef A_star
             CLOSED = [];
             CURRENT = start;
             while (CURRENT(1) ~= goal(1) || CURRENT(2) ~= goal(2))
-                min_f_cost = map_size * 1.41;
+                min_f_cost = map_size * 2;
                 CURRENT_index = 0;
                 for index = 1: 1: length(OPEN)/3
                     if OPEN( 3 * index ) < min_f_cost
@@ -31,14 +31,22 @@ classdef A_star
                 disp(CURRENT);
                 disp('open: ');
                 disp(OPEN);
+                if (CURRENT(1) ~= start(1) || CURRENT(2) ~= start(2)) &&...
+                        (CURRENT(1) ~= goal(1) || CURRENT(2) ~= goal(2))
+                    plot(CURRENT(1), CURRENT(2),'whiteo',...
+                        'LineWidth',1,...
+                        'MarkerSize',round(360/ map_size),...
+                        'MarkerEdgeColor',[0.9, 1, 0.9],...
+                        'MarkerFaceColor',[0.9, 1, 0.9]);
+                end
 
             % remove CURRENT from OPEN set
-                OPEN(CURRENT_index) = [];
-                OPEN(CURRENT_index) = [];
-                OPEN(CURRENT_index) = [];
+                    OPEN(CURRENT_index) = [];
+                    OPEN(CURRENT_index) = [];
+                    OPEN(CURRENT_index) = [];
             % add CURRENT to CLOSED set
                 CLOSED = [CLOSED; CURRENT];
-                map(round(CURRENT(1)), round(CURRENT(2))) = 3;
+                map(round(CURRENT(1)), round(CURRENT(2))) = 3; 
 
             % continue
                 neighbor = [];
