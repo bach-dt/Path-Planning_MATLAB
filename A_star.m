@@ -33,7 +33,7 @@ classdef A_star
                         (CURRENT.data(1) ~= goal(1) || CURRENT.data(2) ~= goal(2))
                     plot(CURRENT.data(1), CURRENT.data(2),'whiteo',...
                         'LineWidth',1,...
-                        'MarkerSize',round(360/ map_size),...
+                        'MarkerSize',round(300/ map_size),...
                         'MarkerEdgeColor',[0.9, 1, 0.9],...
                         'MarkerFaceColor',[0.9, 1, 0.9]);
                 end
@@ -84,22 +84,19 @@ classdef A_star
             end
             
         % print path
-            path = [];
+            path = [goal];
             point = CURRENT;
             while (point.data(1) ~= start(1) || point.data(2) ~= start(2))
                 point = point.parent;
                 path = [path; point.data];
             end
+            path = [path; start];
             
             path(length(path), :) = [];
             rand_r = rand(1) / 2 + 0.5;
             rand_g = rand(1) / 2 + 0.5;
             rand_b = rand(1) / 2 + 0.5;
-            plot(path(:, 1), path(:, 2),'whiteo',...
-                'LineWidth',1,...
-                'MarkerSize',round(360/ map_size),...
-                'MarkerEdgeColor',[rand_r, rand_g, rand_b],...
-                'MarkerFaceColor',[rand_r, rand_g, rand_b]); 
+            plot(path(:, 1), path(:, 2), 'b-s');
                 
         end
         function cost = COST(obj, A, B)
