@@ -22,7 +22,7 @@ function varargout = path_planning(varargin)
 
 % Edit the above text to modify the response to help path_planning
 
-% Last Modified by GUIDE v2.5 22-Aug-2022 11:49:17
+% Last Modified by GUIDE v2.5 23-Aug-2022 00:52:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -46,6 +46,34 @@ end
 % --- Executes just before path_planning is made visible.
 function path_planning_OpeningFcn(hObject, eventdata, handles, varargin)
 clc;
+global map_size;
+global Valid;
+handles.size_50.Value = 1;
+handles.map_style.Value = 1;
+map_size = 50;
+Valid = zeros(map_size - 1, map_size - 1, 1);
+for index = 1: 1: map_size
+    Valid(1, index, 1) = 1;
+    Valid(index, 1, 1) = 1;
+    Valid(map_size, index, 1) = 1;
+    Valid(index, map_size, 1) = 1;
+end
+plot_x = [];
+plot_y = [];
+for x = 1: 1: map_size
+    for y = 1: 1: map_size
+        if (Valid(x, y) == 1)
+            plot_x = [plot_x, x - 0.5];
+            plot_y = [plot_y, y - 0.5];
+        end
+    end
+end
+plot(plot_x,plot_y,'whites',...
+    'LineWidth',1,...
+    'MarkerSize',round(575 / map_size),...
+    'MarkerEdgeColor','black',...
+    'MarkerFaceColor',[0, 0, 0]);
+hold on;
 
 handles.output = hObject;
 
@@ -61,37 +89,80 @@ function varargout = path_planning_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 % --- Executes during object creation, after setting all properties.
-function map_size_CreateFcn(hObject, eventdata, handles)
+function map_style_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
-% --- Executes on selection change in map_size.
-function map_size_Callback(hObject, eventdata, handles)
+% --- Executes on selection change in map_style.
+function map_style_Callback(hObject, eventdata, handles)
 global map_size;
-size = get(hObject, 'Value');
-switch size
+global Valid;
+map_style = get(hObject, 'Value');
+switch map_style
+    case 1
+        if handles.size_30 == 1
+            map_size = 30;
+        elseif handles.size_50 == 1
+            map_size = 50;
+        elseif handles.size_100 == 1
+            map_size = 100;
+        else
+            map_size = 50;
+        end
+        Valid = zeros(map_size - 1, map_size - 1, 1);
+        for index = 1: 1: map_size
+            Valid(1, index, 1) = 1;
+            Valid(index, 1, 1) = 1;
+            Valid(map_size, index, 1) = 1;
+            Valid(index, map_size, 1) = 1;
+        end
+
     case 2
+        load('map/map_30.mat');
         map_size = 30;
+        Valid = map_30;
+        handles.size_30.Value = 1;
+        handles.size_50.Value = 0;
+        handles.size_100.Value = 0;
     case 3
+        load('map/map_50.mat');
         map_size = 50;
+        Valid = map_50;
+        handles.size_30.Value = 0;
+        handles.size_50.Value = 1;
+        handles.size_100.Value = 0;
     case 4
+        load('map/map_100.mat');
         map_size = 100;
+        Valid = map_100;
+        handles.size_30.Value = 0;
+        handles.size_50.Value = 0;
+        handles.size_100.Value = 1;
 end
-disp (map_size)
 
 % --- Executes on button press in start_point.
 function start_point_Callback(hObject, eventdata, handles)
 global start;
 global map_size;
-hold on;
-try
-    plot(start(1), start(2),'whiteo',...
-        'LineWidth',1,...
-        'MarkerSize',round(360/ map_size),...
-        'MarkerEdgeColor','white',...
-        'MarkerFaceColor',[1, 1, 1]);
+global Valid;
+hold off;
+plot_x = [];
+plot_y = [];
+for x = 1: 1: map_size
+    for y = 1: 1: map_size
+        if (Valid(x, y) == 1)
+            plot_x = [plot_x, x - 0.5];
+            plot_y = [plot_y, y - 0.5];
+        end
+    end
 end
+plot(plot_x,plot_y,'whites',...
+    'LineWidth',1,...
+    'MarkerSize',round(575 / map_size),...
+    'MarkerEdgeColor','black',...
+    'MarkerFaceColor',[0, 0, 0]);
+hold on;
 handles.goal_point.Value = 0;
 handles.obstacle_point.Value = 0;
 obs = ginput(1);
@@ -115,14 +186,19 @@ plot(start(1), start(2),'whiteo',...
 function goal_point_Callback(hObject, eventdata, handles)
 global goal;
 global map_size;
-hold on;
-try
-    plot(goal(1), goal(2),'whiteo',...
-        'LineWidth',1,...
-        'MarkerSize',round(360/ map_size),...
-        'MarkerEdgeColor','white',...
-        'MarkerFaceColor',[1, 1, 1]);
+global Valid;
+hold off;
+plot_x = [];
+plot_y = [];
+for x = 1: 1: map_size
+    for y = 1: 1: map_size
+        if (Valid(x, y) == 1)
+            plot_x = [plot_x, x - 0.5];
+            plot_y = [plot_y, y - 0.5];
+        end
+    end
 end
+hold on;
 handles.obstacle_point.Value = 0;
 handles.start_point.Value = 0;
 obs = ginput(1);
@@ -178,41 +254,78 @@ handles.obstacle_point.Value = 0;
 
 % --- Executes on button press in make_map.
 function make_map_Callback(hObject, eventdata, handles)
-clc;
+hold off;
 global map_size;
-global edge_x;
-global edge_y;
 global Valid;
-edge_x = [];
-edge_y = [];
-Valid = zeros(map_size - 1, map_size - 1, 1);
+plot_x = [];
+plot_y = [];
+for x = 1: 1: map_size
+    for y = 1: 1: map_size
+        if (Valid(x, y) == 1)
+            plot_x = [plot_x, x - 0.5];
+            plot_y = [plot_y, y - 0.5];
+        end
+    end
+end
+plot(plot_x,plot_y,'whites',...
+    'LineWidth',1,...
+    'MarkerSize',round(575 / map_size),...
+    'MarkerEdgeColor','black',...
+    'MarkerFaceColor',[0, 0, 0]);
+hold on;
 
+% --- Executes on mouse press over axes background.
+function map_ButtonDownFcn(hObject, eventdata, handles)
+
+% --- Executes on button press in size_30.
+function size_30_Callback(hObject, eventdata, handles)
+global map_size;
+map_size = 30;
+global Valid;
+Valid = zeros(map_size - 1, map_size - 1, 1);
 for index = 1: 1: map_size
     Valid(1, index, 1) = 1;
     Valid(index, 1, 1) = 1;
     Valid(map_size, index, 1) = 1;
     Valid(index, map_size, 1) = 1;
 end
+handles.map_style.Value = 1;
+handles.size_50.Value = 0;
+handles.size_100.Value = 0;
 
-for x = 1: 1: map_size
-    for y = 1: 1: map_size
-        if (Valid(x, y) == 1)
-            edge_x = [edge_x, x - 0.5];
-            edge_y = [edge_y, y - 0.5];
-        end
-    end
+% --- Executes on button press in size_50.
+function size_50_Callback(hObject, eventdata, handles)
+global map_size;
+map_size = 50;
+global Valid;
+Valid = zeros(map_size - 1, map_size - 1, 1);
+for index = 1: 1: map_size
+    Valid(1, index, 1) = 1;
+    Valid(index, 1, 1) = 1;
+    Valid(map_size, index, 1) = 1;
+    Valid(index, map_size, 1) = 1;
 end
-global obstacle;
-obstacle = [];
-hold off;
-plot(edge_x,edge_y,'whites',...
-    'LineWidth',1,...
-    'MarkerSize',round(575 / map_size),...
-    'MarkerEdgeColor','black',...
-    'MarkerFaceColor',[0, 0, 0]);
+handles.map_style.Value = 1;
+handles.size_30.Value = 0;
+handles.size_100.Value = 0;
 
-% --- Executes on mouse press over axes background.
-function map_ButtonDownFcn(hObject, eventdata, handles)
+
+% --- Executes on button press in size_100.
+function size_100_Callback(hObject, eventdata, handles)
+global map_size;
+map_size = 100;
+global Valid;
+Valid = zeros(map_size - 1, map_size - 1, 1);
+for index = 1: 1: map_size
+    Valid(1, index, 1) = 1;
+    Valid(index, 1, 1) = 1;
+    Valid(map_size, index, 1) = 1;
+    Valid(index, map_size, 1) = 1;
+end
+handles.map_style.Value = 1;
+handles.size_30.Value = 0;
+handles.size_50.Value = 0;
+
 
 % --- Executes on button press in clear_path.
 function clear_path_Callback(hObject, eventdata, handles)
@@ -248,6 +361,21 @@ plot(goal(1), goal(2),'whiteo',...
     'MarkerSize',round(360/ map_size),...
     'MarkerEdgeColor','green',...
     'MarkerFaceColor',[0, 1, 0]);
+%{
+if handles.size_30.Value == 1
+    map_30 = Valid;
+    save('map/map_30.mat', 'map_30');
+end
+if handles.size_50.Value == 1
+    map_50 = Valid;
+    save('map/map_50.mat', 'map_50');
+end
+if handles.size_100.Value == 1
+    map_100 = Valid;
+    save('map/map_100.mat', 'map_100');
+end
+%}
+    
 
 % --- Executes on button press in A_star.
 function A_star_Callback(hObject, eventdata, handles)
