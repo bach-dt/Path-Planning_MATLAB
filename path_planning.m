@@ -22,7 +22,7 @@ function varargout = path_planning(varargin)
 
 % Edit the above text to modify the response to help path_planning
 
-% Last Modified by GUIDE v2.5 23-Aug-2022 09:36:48
+% Last Modified by GUIDE v2.5 24-Aug-2022 01:26:04
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -84,8 +84,8 @@ plot(plot_x,plot_y,'whites',...
     'MarkerFaceColor',[0, 0, 0]);
 hold on;
 
-start = [15.5, 15.5];
-goal = [34.5, 34.5];
+start = [10.5, 10.5];
+goal = [39.5, 39.5];
 disp('start :');
 disp(start);
 disp('goal :');
@@ -123,46 +123,19 @@ end
 
 % --- Executes on selection change in map_style.
 function map_style_Callback(hObject, eventdata, handles)
-global map_size;
-global Valid;
 map_style = get(hObject, 'Value');
 switch map_style
     case 1
-        if handles.size_30 == 1
-            map_size = 30;
-        elseif handles.size_50 == 1
-            map_size = 50;
-        elseif handles.size_100 == 1
-            map_size = 100;
-        else
-            map_size = 50;
-        end
-        Valid = zeros(map_size, map_size, 1);
-        for index = 1: 1: map_size
-            Valid(1, index, 1) = 1;
-            Valid(index, 1, 1) = 1;
-            Valid(map_size, index, 1) = 1;
-            Valid(index, map_size, 1) = 1;
-        end
-
+        % do nothing
     case 2
-        load('map/map_30.mat');
-        map_size = 30;
-        Valid = map_30;
         handles.size_30.Value = 1;
         handles.size_50.Value = 0;
         handles.size_100.Value = 0;
     case 3
-        load('map/map_50.mat');
-        map_size = 50;
-        Valid = map_50;
         handles.size_30.Value = 0;
         handles.size_50.Value = 1;
         handles.size_100.Value = 0;
     case 4
-        load('map/map_100.mat');
-        map_size = 100;
-        Valid = map_100;
         handles.size_30.Value = 0;
         handles.size_50.Value = 0;
         handles.size_100.Value = 1;
@@ -267,9 +240,12 @@ plot(goal(1), goal(2),'whiteo',...
 
 % --- Executes on button press in obstacle_point.
 function obstacle_point_Callback(hObject, eventdata, handles)
+global start;
+global goal;
 global obstacle;
 global Valid;
 global map_size;
+global d_RRT;
 hold on;
 handles.goal_point.Value = 0;
 handles.start_point.Value = 0;
@@ -287,17 +263,25 @@ while (obs(1) < map_size && obs(2) < map_size)
                 'MarkerEdgeColor',[1, 1, 1],...
                 'MarkerFaceColor',[1, 1, 1]);
             continue
+        else
+            obstacle = [obstacle; [obs_x, obs_y]];
+            Valid(obs_x + 0.5, obs_y + 0.5) = 1;
+            plot(obs_x, obs_y,'whites',...
+                'LineWidth',1,...
+                'MarkerSize',round(575 / map_size),...
+                'MarkerEdgeColor',[0, 0, 0],...
+                'MarkerFaceColor',[0, 0, 0]);
         end
-        obstacle = [obstacle; [obs_x, obs_y]];
-        Valid(obs_x + 0.5, obs_y + 0.5) = 1;
-        plot(obs_x, obs_y,'whites',...
-            'LineWidth',1,...
-            'MarkerSize',round(575 / map_size),...
-            'MarkerEdgeColor',[0, 0, 0],...
-            'MarkerFaceColor',[0, 0, 0]);
+        if handles.dynamic_RRT.Value == 1
+            d_RRT.repeat_dynamic_RRT(Valid, goal, map_size);
+        end
+        if handles.dynamic_RRT_star.Value == 1
+            d_RRT.repeat_dynamic_RRT_star(Valid, goal, map_size);
+        end
     end
 end
 handles.obstacle_point.Value = 0;
+
 
 % --- Executes on button press in make_map.
 function make_map_Callback(hObject, eventdata, handles)
@@ -310,6 +294,61 @@ global map_size;
 global Valid;
 plot_x = [];
 plot_y = [];
+
+handles.dynamic_RRT_star.Value = 0;
+handles.dynamic_RRT.Value = 0;
+
+map_style = get(handles.map_style, 'Value');
+switch map_style
+    case 1
+        if handles.size_30.Value == 1
+            map_size = 30;
+        elseif handles.size_50.Value == 1
+            map_size = 50;
+        elseif handles.size_100.Value == 1
+            map_size = 100;
+        else
+            handles.size_50.Value = 1;
+            map_size = 50;
+        end
+        Valid = zeros(map_size, map_size, 1);
+        for index = 1: 1: map_size
+            Valid(1, index, 1) = 1;
+            Valid(index, 1, 1) = 1;
+            Valid(map_size, index, 1) = 1;
+            Valid(index, map_size, 1) = 1;
+        end
+
+    case 2
+        load('map/map_30.mat');
+        map_size = 30;
+        Valid = map_30;
+    case 3
+        load('map/map_50.mat');
+        map_size = 50;
+        Valid = map_50;
+    case 4
+        load('map/map_100.mat');
+        map_size = 100;
+        Valid = map_100;
+end
+
+start = [round(0.2 * map_size) + 0.5, round(0.2 * map_size) + 0.5];
+goal = [round(0.8 * map_size) - 0.5, round(0.8 * map_size) - 0.5];
+
+plot(start(1), start(2),'whiteo',...
+    'LineWidth',1,...
+    'MarkerSize',round(360/ map_size),...
+    'MarkerEdgeColor','red',...
+    'MarkerFaceColor',[1, 0, 0]);
+hold on;
+
+plot(goal(1), goal(2),'whiteo',...
+    'LineWidth',1,...
+    'MarkerSize',round(360/ map_size),...
+    'MarkerEdgeColor','green',...
+    'MarkerFaceColor',[0, 1, 0]);
+
 for x = 1: 1: map_size
     for y = 1: 1: map_size
         if (Valid(x, y) == 1)
@@ -323,39 +362,18 @@ plot(plot_x,plot_y,'whites',...
     'MarkerSize',round(575 / map_size),...
     'MarkerEdgeColor','black',...
     'MarkerFaceColor',[0, 0, 0]);
-hold on;
 
 % --- Executes on mouse press over axes background.
 function map_ButtonDownFcn(hObject, eventdata, handles)
 
 % --- Executes on button press in size_30.
 function size_30_Callback(hObject, eventdata, handles)
-global map_size;
-map_size = 30;
-global Valid;
-Valid = zeros(map_size, map_size, 1);
-for index = 1: 1: map_size
-    Valid(1, index, 1) = 1;
-    Valid(index, 1, 1) = 1;
-    Valid(map_size, index, 1) = 1;
-    Valid(index, map_size, 1) = 1;
-end
 handles.map_style.Value = 1;
 handles.size_50.Value = 0;
 handles.size_100.Value = 0;
 
 % --- Executes on button press in size_50.
 function size_50_Callback(hObject, eventdata, handles)
-global map_size;
-map_size = 50;
-global Valid;
-Valid = zeros(map_size, map_size, 1);
-for index = 1: 1: map_size
-    Valid(1, index, 1) = 1;
-    Valid(index, 1, 1) = 1;
-    Valid(map_size, index, 1) = 1;
-    Valid(index, map_size, 1) = 1;
-end
 handles.map_style.Value = 1;
 handles.size_30.Value = 0;
 handles.size_100.Value = 0;
@@ -363,16 +381,6 @@ handles.size_100.Value = 0;
 
 % --- Executes on button press in size_100.
 function size_100_Callback(hObject, eventdata, handles)
-global map_size;
-map_size = 100;
-global Valid;
-Valid = zeros(map_size, map_size, 1);
-for index = 1: 1: map_size
-    Valid(1, index, 1) = 1;
-    Valid(index, 1, 1) = 1;
-    Valid(map_size, index, 1) = 1;
-    Valid(index, map_size, 1) = 1;
-end
 handles.map_style.Value = 1;
 handles.size_30.Value = 0;
 handles.size_50.Value = 0;
@@ -430,6 +438,8 @@ end
 
 % --- Executes on button press in A_star.
 function A_star_Callback(hObject, eventdata, handles)
+handles.dynamic_RRT_star.Value = 0;
+handles.dynamic_RRT.Value = 0;
 global Valid;
 global start;
 global goal;
@@ -439,6 +449,8 @@ A.A_star_path(Valid, start, goal, map_size);
 
 % --- Executes on button press in RRT.
 function RRT_Callback(hObject, eventdata, handles)
+handles.dynamic_RRT_star.Value = 0;
+handles.dynamic_RRT.Value = 0;
 global Valid;
 global start;
 global goal;
@@ -448,6 +460,8 @@ R.RRT_path(Valid, start, goal, map_size);
 
 % --- Executes on button press in RRT_connect.
 function RRT_connect_Callback(hObject, eventdata, handles)
+handles.dynamic_RRT_star.Value = 0;
+handles.dynamic_RRT.Value = 0;
 global Valid;
 global start;
 global goal;
@@ -457,6 +471,8 @@ R.RRT_connect_path(Valid, start, goal, map_size);
 
 
 % --- Executes on button press in RRT_star.
+handles.dynamic_RRT_star.Value = 0;
+handles.dynamic_RRT.Value = 0;
 function RRT_star_Callback(hObject, eventdata, handles)
 global Valid;
 global start;
@@ -464,3 +480,31 @@ global goal;
 global map_size;
 R = RRT_star;
 R.RRT_star_path(Valid, start, goal, map_size);
+
+
+% --- Executes on button press in dynamic_RRT.
+function dynamic_RRT_Callback(hObject, eventdata, handles)
+if handles.dynamic_RRT.Value == 1
+    handles.dynamic_RRT_star.Value = 0;
+end
+global Valid;
+global start;
+global goal;
+global map_size;
+global d_RRT;
+d_RRT = dynamic_RRT;
+d_RRT.dynamic_RRT_path(Valid, start, goal, map_size, []);
+
+
+% --- Executes on button press in dynamic_RRT_star.
+function dynamic_RRT_star_Callback(hObject, eventdata, handles)
+if handles.dynamic_RRT_star.Value == 1
+    handles.dynamic_RRT.Value = 0;
+end
+global Valid;
+global start;
+global goal;
+global map_size;
+global d_RRT;
+d_RRT = dynamic_RRT_star;
+d_RRT.dynamic_RRT_star_path(Valid, start, goal, map_size, []);

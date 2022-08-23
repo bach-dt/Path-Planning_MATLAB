@@ -1,6 +1,32 @@
-classdef RRT_star
+classdef dynamic_RRT_star
+    properties
+        % nothing  :)
+    end
     methods 
-        function [] = RRT_star_path(obj, map, start, goal, map_size)
+        function repeat_dynamic_RRT_star(obj, map, goal, map_size)
+            hold on;
+            global path;
+            global radiusK;
+            met_obs = 0;
+            
+            plot(path(:, 1), path(:, 2),'y-*'); 
+            
+            for index = 1: 1: length(path)
+                if obj.check_valid(map, radiusK, path(index, :)) == 0
+                    obs_index = index;
+                    met_obs = 1;
+                end
+            end
+            if (met_obs == 1)
+                old_path = path(obs_index + 2 : length(path), :);
+                obj.dynamic_RRT_star_path(map, path(obs_index + 1, :), goal, map_size, old_path);
+            end
+            
+        end
+        
+        function path = dynamic_RRT_star_path(obj, map, start, goal, map_size, old_path)
+            global radiusK;
+            global path;
             hold on;
             
         % define dimension
@@ -77,8 +103,10 @@ classdef RRT_star
                 disp(obj.COST(point.data, point.prev.data));
                 point = point.prev;
             end
-            path = [path; start];
-            plot(path(:, 1), path(:, 2),'k-*'); 
+            path = [path; start; old_path];
+            plot(path(:, 1), path(:, 2),'k-*');
+        % disp path
+            disp(path);
             
         end
         function cost = COST(obj, A, B)
@@ -103,8 +131,7 @@ classdef RRT_star
                         end
                     end
                 end
-            end
-                        
+            end           
         end
     end
 end
