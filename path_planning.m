@@ -53,14 +53,14 @@ global map_size;
 global Valid;
 
 handles.size_50.Value = 1;
-handles.size_50.Value = 0;
-handles.size_50.Value = 0;
+handles.size_30.Value = 0;
+handles.size_100.Value = 0;
 handles.start_point.Value = 0;
 handles.goal_point.Value = 0;
 handles.obstacle_point.Value = 0;
 handles.map_style.Value = 1;
 map_size = 50;
-Valid = zeros(map_size - 1, map_size - 1, 1);
+Valid = zeros(map_size, map_size, 1);
 for index = 1: 1: map_size
     Valid(1, index, 1) = 1;
     Valid(index, 1, 1) = 1;
@@ -137,7 +137,7 @@ switch map_style
         else
             map_size = 50;
         end
-        Valid = zeros(map_size - 1, map_size - 1, 1);
+        Valid = zeros(map_size, map_size, 1);
         for index = 1: 1: map_size
             Valid(1, index, 1) = 1;
             Valid(index, 1, 1) = 1;
@@ -333,7 +333,7 @@ function size_30_Callback(hObject, eventdata, handles)
 global map_size;
 map_size = 30;
 global Valid;
-Valid = zeros(map_size - 1, map_size - 1, 1);
+Valid = zeros(map_size, map_size, 1);
 for index = 1: 1: map_size
     Valid(1, index, 1) = 1;
     Valid(index, 1, 1) = 1;
@@ -349,7 +349,7 @@ function size_50_Callback(hObject, eventdata, handles)
 global map_size;
 map_size = 50;
 global Valid;
-Valid = zeros(map_size - 1, map_size - 1, 1);
+Valid = zeros(map_size, map_size, 1);
 for index = 1: 1: map_size
     Valid(1, index, 1) = 1;
     Valid(index, 1, 1) = 1;
@@ -366,7 +366,7 @@ function size_100_Callback(hObject, eventdata, handles)
 global map_size;
 map_size = 100;
 global Valid;
-Valid = zeros(map_size - 1, map_size - 1, 1);
+Valid = zeros(map_size, map_size, 1);
 for index = 1: 1: map_size
     Valid(1, index, 1) = 1;
     Valid(index, 1, 1) = 1;

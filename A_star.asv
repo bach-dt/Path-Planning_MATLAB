@@ -14,6 +14,9 @@ classdef A_star
             OPEN = [];
             OPEN = [OPEN, CURRENT];
             
+            G_COST_MAP = zeros(map_size, map_size, 1);
+            G_COST_MAP(round(start(1)), round(start(2)), 1) = 0;
+            
             while (CURRENT.data(1) ~= goal(1) || CURRENT.data(2) ~= goal(2))
                 min_f_cost = 100000;
                 CURRENT_index = 0;
@@ -69,12 +72,24 @@ classdef A_star
                                 
                                 neighbor_new_g_cost = obj.COST(this_neighbor.data, CURRENT.data) + ...
                                                       CURRENT.g_cost;
-                                if obj.check_q_new_valid(OPEN, this_neighbor, neighbor_new_g_cost) == 1
+                                if map(this_neighbor.data(1) + 0.5, this_neighbor.data(2) + 0.5) ~= 2 ||...
+                                        neighbor_new_g_cost < G_COST_MAP(this_neighbor.data(1) + 0.5, this_neighbor.data(2) + 0.5, 1)
                                     this_neighbor.g_cost = neighbor_new_g_cost;
                                     this_neighbor.h_cost = obj.COST(this_neighbor.data, goal);
                                     this_neighbor.f_cost = this_neighbor.g_cost + this_neighbor.h_cost;
                                     this_neighbor.parent = CURRENT;
-                                    OPEN = [OPEN, this_neighbor];
+                                    G_COST_MAP(this_neighbor.data(1) + 0.5, this_neighbor.data(2) + 0.5, 1) = neighbor_new_g_cost;
+
+                                    if map(round(this_neighbor.data(1)), round(this_neighbor.data(2))) ~= 2
+                                        map(round(this_neighbor.data(1)), round(this_neighbor.data(2))) = 2;
+                                        OPEN = [OPEN, this_neighbor];
+                                    else
+                                        for index = 1: 1: length(OPEN)
+                                            if OPEN(index).data == this_neighbor.data
+                                                OPEN(index) = this_neighbor;
+                                            end
+                                        end
+                                    end
                                 end
 
                             end
@@ -120,18 +135,11 @@ classdef A_star
         end
         
         function check = check_q_new_valid(obj, set, point, cost)
-            check = 1;
             for index = 1: 1: length(set)
-                if set(index).data == point.data
-                    if set(index).g_cost <= cost
-                        check = 0;
-                        return;
-                    end
-                    set(index) = [];
-                    return;
+                if OPEN(index).data == this_neighbor.data
+                    OPEN(index) = this_neighbor;
                 end
             end
-            return;
         end
     end
 end
