@@ -22,7 +22,7 @@ function varargout = path_planning(varargin)
 
 % Edit the above text to modify the response to help path_planning
 
-% Last Modified by GUIDE v2.5 23-Aug-2022 00:52:52
+% Last Modified by GUIDE v2.5 23-Aug-2022 09:36:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -46,9 +46,18 @@ end
 % --- Executes just before path_planning is made visible.
 function path_planning_OpeningFcn(hObject, eventdata, handles, varargin)
 clc;
+hold off;
+global start;
+global goal;
 global map_size;
 global Valid;
+
 handles.size_50.Value = 1;
+handles.size_50.Value = 0;
+handles.size_50.Value = 0;
+handles.start_point.Value = 0;
+handles.goal_point.Value = 0;
+handles.obstacle_point.Value = 0;
 handles.map_style.Value = 1;
 map_size = 50;
 Valid = zeros(map_size - 1, map_size - 1, 1);
@@ -74,6 +83,24 @@ plot(plot_x,plot_y,'whites',...
     'MarkerEdgeColor','black',...
     'MarkerFaceColor',[0, 0, 0]);
 hold on;
+
+start = [15.5, 15.5];
+goal = [34.5, 34.5];
+disp('start :');
+disp(start);
+disp('goal :');
+disp(goal);
+plot(start(1), start(2),'whiteo',...
+    'LineWidth',1,...
+    'MarkerSize',round(360/ map_size),...
+    'MarkerEdgeColor','red',...
+    'MarkerFaceColor',[1, 0, 0]);
+
+plot(goal(1), goal(2),'whiteo',...
+    'LineWidth',1,...
+    'MarkerSize',round(360/ map_size),...
+    'MarkerEdgeColor','green',...
+    'MarkerFaceColor',[0, 1, 0]);
 
 handles.output = hObject;
 
@@ -144,6 +171,7 @@ end
 % --- Executes on button press in start_point.
 function start_point_Callback(hObject, eventdata, handles)
 global start;
+global goal;
 global map_size;
 global Valid;
 hold off;
@@ -163,6 +191,13 @@ plot(plot_x,plot_y,'whites',...
     'MarkerEdgeColor','black',...
     'MarkerFaceColor',[0, 0, 0]);
 hold on;
+if (goal(1) ~= 0 && goal(2) ~= 0)
+    plot(goal(1), goal(2),'whiteo',...
+        'LineWidth',1,...
+        'MarkerSize',round(360 / map_size),...
+        'MarkerEdgeColor','green',...
+        'MarkerFaceColor',[0, 1, 0]);
+end
 handles.goal_point.Value = 0;
 handles.obstacle_point.Value = 0;
 obs = ginput(1);
@@ -172,6 +207,7 @@ if (obs(1) < map_size && obs(2) < map_size)
     start = [obs_x, obs_y];
 end
 handles.start_point.Value = 0;
+disp('start :');
 disp(start);
 plot(start(1), start(2),'whiteo',...
     'LineWidth',1,...
@@ -184,6 +220,7 @@ plot(start(1), start(2),'whiteo',...
 
 % --- Executes on button press in goal_point.
 function goal_point_Callback(hObject, eventdata, handles)
+global start;
 global goal;
 global map_size;
 global Valid;
@@ -198,24 +235,35 @@ for x = 1: 1: map_size
         end
     end
 end
+plot(plot_x,plot_y,'whites',...
+    'LineWidth',1,...
+    'MarkerSize',round(575 / map_size),...
+    'MarkerEdgeColor','black',...
+    'MarkerFaceColor',[0, 0, 0]);
 hold on;
+if (start(1) ~= 0 && start(2) ~= 0)
+    plot(start(1), start(2),'whiteo',...
+        'LineWidth',1,...
+        'MarkerSize',round(360 / map_size),...
+        'MarkerEdgeColor','red',...
+        'MarkerFaceColor',[1, 0, 0]);
+end
+handles.goal_point.Value = 0;
 handles.obstacle_point.Value = 0;
-handles.start_point.Value = 0;
 obs = ginput(1);
 if (obs(1) < map_size && obs(2) < map_size)
     obs_x = round(obs(1) - 0.5) + 0.5;
     obs_y = round(obs(2) - 0.5) + 0.5;
     goal = [obs_x, obs_y];
 end
-handles.goal_point.Value = 0;
-disp('goal: ');
+handles.start_point.Value = 0;
+disp('goal : ');
 disp(goal);
 plot(goal(1), goal(2),'whiteo',...
     'LineWidth',1,...
     'MarkerSize',round(360/ map_size),...
     'MarkerEdgeColor','green',...
     'MarkerFaceColor',[0, 1, 0]);
-
 
 % --- Executes on button press in obstacle_point.
 function obstacle_point_Callback(hObject, eventdata, handles)
@@ -225,7 +273,6 @@ global map_size;
 hold on;
 handles.goal_point.Value = 0;
 handles.start_point.Value = 0;
-disp(obstacle);
 obs = [0, 0];
 while (obs(1) < map_size && obs(2) < map_size)
     obs = ginput(1);
@@ -255,6 +302,10 @@ handles.obstacle_point.Value = 0;
 % --- Executes on button press in make_map.
 function make_map_Callback(hObject, eventdata, handles)
 hold off;
+global start;
+global goal;
+start = [0, 0];
+goal = [0, 0];
 global map_size;
 global Valid;
 plot_x = [];
@@ -403,3 +454,13 @@ global goal;
 global map_size;
 R = RRT_connect;
 R.RRT_connect_path(Valid, start, goal, map_size);
+
+
+% --- Executes on button press in RRT_star.
+function RRT_star_Callback(hObject, eventdata, handles)
+global Valid;
+global start;
+global goal;
+global map_size;
+R = RRT_star;
+R.RRT_star_path(Valid, start, goal, map_size);

@@ -2,7 +2,7 @@ classdef RRT
     methods 
         function [] = RRT_path(obj, map, start, goal, map_size)
             hold on;
-            max_dms = 7;
+            max_dms = 5;
             q_start.data = start;
             q_start.next = [];
             q_start.prev = [];

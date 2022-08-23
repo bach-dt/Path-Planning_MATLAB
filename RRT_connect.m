@@ -63,7 +63,7 @@ classdef RRT_connect
     % EXTEND FUNCTION
         function extend = Extend(obj, q_target, map_size, map)
             
-            max_dms = 7;
+            max_dms = 5;
             
             global last_q_target;
             global last_q_new;

@@ -15,7 +15,7 @@ classdef A_star
             OPEN = [OPEN, CURRENT];
             
             G_COST_MAP = zeros(map_size, map_size, 1);
-            G_COST_MAP(start(1) + 0.5, start(2) + 0.5, 1) = 0;
+            G_COST_MAP(round(start(1)), round(start(2)), 1) = 0;
             
             while (CURRENT.data(1) ~= goal(1) || CURRENT.data(2) ~= goal(2))
                 min_f_cost = map_size * 2;
