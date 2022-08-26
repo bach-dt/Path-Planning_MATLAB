@@ -22,7 +22,7 @@ function varargout = path_planning(varargin)
 
 % Edit the above text to modify the response to help path_planning
 
-% Last Modified by GUIDE v2.5 24-Aug-2022 01:26:04
+% Last Modified by GUIDE v2.5 25-Aug-2022 23:12:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -246,6 +246,7 @@ global obstacle;
 global Valid;
 global map_size;
 global d_RRT;
+global d_RRT_star;
 hold on;
 handles.goal_point.Value = 0;
 handles.start_point.Value = 0;
@@ -276,7 +277,7 @@ while (obs(1) < map_size && obs(2) < map_size)
             d_RRT.repeat_dynamic_RRT(Valid, goal, map_size);
         end
         if handles.dynamic_RRT_star.Value == 1
-            d_RRT.repeat_dynamic_RRT_star(Valid, goal, map_size);
+            d_RRT_star.repeat_dynamic_RRT_star(Valid, goal, map_size);
         end
     end
 end
@@ -505,6 +506,18 @@ global Valid;
 global start;
 global goal;
 global map_size;
-global d_RRT;
-d_RRT = dynamic_RRT_star;
-d_RRT.dynamic_RRT_star_path(Valid, start, goal, map_size, []);
+global d_RRT_star;
+d_RRT_star = dynamic_RRT_star;
+d_RRT_star.dynamic_RRT_star_path(Valid, start, goal, map_size, []);
+
+
+% --- Executes on button press in dynamic_A_star.
+function dynamic_A_star_Callback(hObject, eventdata, handles)
+handles.dynamic_RRT_star.Value = 0;
+handles.dynamic_RRT.Value = 0;
+global Valid;
+global start;
+global goal;
+global map_size;
+d_A_star = dynamic_A_star;
+d_A_star.dynamic_A_star_path(Valid, start, goal, map_size);
