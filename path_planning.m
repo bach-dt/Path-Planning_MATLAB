@@ -52,14 +52,18 @@ global goal;
 global map_size;
 global Valid;
 
-handles.size_50.Value = 1;
-handles.size_30.Value = 0;
+handles.size_50.Value = 0;
+handles.size_30.Value = 1;
 handles.size_100.Value = 0;
 handles.start_point.Value = 0;
 handles.goal_point.Value = 0;
 handles.obstacle_point.Value = 0;
 handles.map_style.Value = 1;
-map_size = 50;
+handles.dynamic_A_star.Value = 0;
+handles.dynamic_RRT.Value = 0;
+handles.dynamic_RRT_star.Value = 0;
+
+map_size = 30;
 Valid = zeros(map_size, map_size, 1);
 for index = 1: 1: map_size
     Valid(1, index, 1) = 1;
@@ -85,7 +89,7 @@ plot(plot_x,plot_y,'whites',...
 hold on;
 
 start = [10.5, 10.5];
-goal = [39.5, 39.5];
+goal = [19.5, 19.5];
 disp('start :');
 disp(start);
 disp('goal :');
@@ -247,6 +251,7 @@ global Valid;
 global map_size;
 global d_RRT;
 global d_RRT_star;
+global d_A_star;
 hold on;
 handles.goal_point.Value = 0;
 handles.start_point.Value = 0;
@@ -279,6 +284,10 @@ while (obs(1) < map_size && obs(2) < map_size)
         if handles.dynamic_RRT_star.Value == 1
             d_RRT_star.repeat_dynamic_RRT_star(Valid, goal, map_size);
         end
+        if handles.dynamic_A_star.Value == 1
+            obst = [obs_x, obs_y];
+            d_A_star.repeat_dynamic_A_star(Valid, start, goal, obst, map_size);
+        end
     end
 end
 handles.obstacle_point.Value = 0;
@@ -298,6 +307,7 @@ plot_y = [];
 
 handles.dynamic_RRT_star.Value = 0;
 handles.dynamic_RRT.Value = 0;
+handles.dynamic_A_star.Value = 0;
 
 map_style = get(handles.map_style, 'Value');
 switch map_style
@@ -485,39 +495,45 @@ R.RRT_star_path(Valid, start, goal, map_size);
 
 % --- Executes on button press in dynamic_RRT.
 function dynamic_RRT_Callback(hObject, eventdata, handles)
-if handles.dynamic_RRT.Value == 1
-    handles.dynamic_RRT_star.Value = 0;
-end
 global Valid;
 global start;
 global goal;
 global map_size;
 global d_RRT;
-d_RRT = dynamic_RRT;
-d_RRT.dynamic_RRT_path(Valid, start, goal, map_size, []);
+if handles.dynamic_RRT.Value == 1
+    handles.dynamic_RRT_star.Value = 0;
+    handles.dynamic_A_star.Value = 0;
+    d_RRT = dynamic_RRT;
+    d_RRT.dynamic_RRT_path(Valid, start, goal, map_size, []);
+end
 
 
 % --- Executes on button press in dynamic_RRT_star.
 function dynamic_RRT_star_Callback(hObject, eventdata, handles)
-if handles.dynamic_RRT_star.Value == 1
-    handles.dynamic_RRT.Value = 0;
-end
 global Valid;
 global start;
 global goal;
 global map_size;
 global d_RRT_star;
-d_RRT_star = dynamic_RRT_star;
-d_RRT_star.dynamic_RRT_star_path(Valid, start, goal, map_size, []);
+if handles.dynamic_RRT_star.Value == 1
+    handles.dynamic_RRT.Value = 0;
+    handles.dynamic_A_star.Value = 0;
+    d_RRT_star = dynamic_RRT_star;
+    d_RRT_star.dynamic_RRT_star_path(Valid, start, goal, map_size, []);
+end
+
 
 
 % --- Executes on button press in dynamic_A_star.
 function dynamic_A_star_Callback(hObject, eventdata, handles)
-handles.dynamic_RRT_star.Value = 0;
-handles.dynamic_RRT.Value = 0;
 global Valid;
 global start;
 global goal;
 global map_size;
-d_A_star = dynamic_A_star;
-d_A_star.dynamic_A_star_path(Valid, start, goal, map_size);
+global d_A_star;
+if handles.dynamic_A_star.Value == 1
+    handles.dynamic_RRT_star.Value = 0;
+    handles.dynamic_RRT.Value = 0;
+    d_A_star = dynamic_A_star;
+    d_A_star.dynamic_A_star_path(Valid, start, goal, map_size);
+end
