@@ -88,8 +88,8 @@ plot(plot_x,plot_y,'whites',...
     'MarkerFaceColor',[0, 0, 0]);
 hold on;
 
-start = [10.5, 10.5];
-goal = [19.5, 19.5];
+start = [6.5, 6.5];
+goal = [23.5, 23.5];
 disp('start :');
 disp(start);
 disp('goal :');
@@ -431,6 +431,7 @@ plot(goal(1), goal(2),'whiteo',...
     'MarkerSize',round(360/ map_size),...
     'MarkerEdgeColor','green',...
     'MarkerFaceColor',[0, 1, 0]);
+
 %{
 if handles.size_30.Value == 1
     map_30 = Valid;
@@ -444,7 +445,8 @@ if handles.size_100.Value == 1
     map_100 = Valid;
     save('map/map_100.mat', 'map_100');
 end
-%}
+    %}
+
     
 
 % --- Executes on button press in A_star.
