@@ -40,7 +40,7 @@ classdef A_star
             
             while (CURRENT.data(1) ~= goal(1) || CURRENT.data(2) ~= goal(2))
                 min_f_cost = 100000;
-                
+                pause(0.05);
                 check = 0;
                 for x = 1: 1: map_size
                     for y = 1: 1: map_size

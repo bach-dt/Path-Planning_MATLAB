@@ -30,6 +30,7 @@ classdef RRT_connect
             Tb = [q_goal];
             
             while 1
+                pause(0.05);
                 q_target.data = [rand(1) * map_size, rand(1) * map_size];
                 if (obj.Extend(q_target, map_size, map) ~= 0)
                     if (obj.Connect(q_new, map_size, map) == 1)

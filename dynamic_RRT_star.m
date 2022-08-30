@@ -46,6 +46,7 @@ classdef dynamic_RRT_star
             gamma = 15;
             
             while (obj.COST(q_new.data, goal) > max_dms)
+                pause(0.05);
                 q_target = [rand(1) * map_size, rand(1) * map_size];
                 min_cost = 100000;
                 q_nearest = [];

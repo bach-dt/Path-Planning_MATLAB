@@ -77,6 +77,7 @@ classdef dynamic_A_star
             global last_map;
             global path;
             while 1
+                pause(0.05);
                 k_min = 100000;
                 check = 0;
                 for x = 1: 1: map_size
@@ -233,7 +234,10 @@ classdef dynamic_A_star
             disp(path);
             disp('---------------------------');
             disp(valid_map(6, 5).parent);
-            plot(path(:, 1), path(:, 2), 'b-s');
+            for index = 1: 1: length(path) - 1
+                pause(0.05);
+                plot(path(index : index + 1, 1), path(index : index + 1, 2), 'b-s');
+            end
             last_map = valid_map;
         end
         

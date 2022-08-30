@@ -2,7 +2,7 @@ classdef RRT
     methods 
         function [] = RRT_path(obj, map, start, goal, map_size)
             hold on;
-            max_dms = 3;
+            max_dms = 5;
             q_start.data = start;
             q_start.next = [];
             q_start.prev = [];
@@ -11,6 +11,7 @@ classdef RRT
             ExploredSet = [ExploredSet, q_start];
             q_new = q_start;
             while (obj.COST(q_new.data, goal) > max_dms)
+                pause(0.05);
                 q_target = [rand(1) * map_size, rand(1) * map_size];
                 min_cost = map_size * 1.41;
                 q_nearest = [];
