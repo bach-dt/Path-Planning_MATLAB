@@ -8,8 +8,7 @@ classdef dynamic_RRT_star
             global path;
             global radiusK;
             met_obs = 0;
-            
-            plot(path(:, 1), path(:, 2),'y-*'); 
+             
             
             for index = 1: 1: length(path)
                 if obj.check_valid(map, radiusK, path(index, :)) == 0
@@ -18,6 +17,7 @@ classdef dynamic_RRT_star
                 end
             end
             if (met_obs == 1)
+                plot(path(:, 1), path(:, 2),'y-*');
                 old_path = path(obs_index + 2 : length(path), :);
                 obj.dynamic_RRT_star_path(map, path(obs_index + 1, :), goal, map_size, old_path);
             end

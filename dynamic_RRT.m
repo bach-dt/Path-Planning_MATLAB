@@ -9,7 +9,6 @@ classdef dynamic_RRT
             global max_dms;
             met_obs = 0;
             
-            plot(path(:, 1), path(:, 2),'y-+'); 
             
             for index = 1: 1: length(path)
                 if obj.check_valid(map, max_dms, path(index, :)) == 0
@@ -18,6 +17,7 @@ classdef dynamic_RRT
                 end
             end
             if (met_obs == 1)
+                plot(path(:, 1), path(:, 2),'y-+'); 
                 old_path = path(obs_index + 2 : length(path), :);
                 obj.dynamic_RRT_path(map, path(obs_index + 1, :), goal, map_size, old_path);
             end
