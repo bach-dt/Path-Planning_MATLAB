@@ -98,8 +98,7 @@ classdef dynamic_RRT
                         end
                     end
                 end
-            end
-                        
+            end    
         end
     end
 end
